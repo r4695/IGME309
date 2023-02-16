@@ -1,4 +1,48 @@
 #include "MyMesh.h"
+void MyMesh::GenerateCircle(float a_fRadius,float a_fHeight, int a_nSubdivisions, vector3 a_v3Color, bool reverse)
+{
+	Release();
+	Init();
+
+	if (a_fRadius < 0.01f)
+		a_fRadius = 0.01f;
+
+	if (a_nSubdivisions < 3)
+		a_nSubdivisions = 3;
+	if (a_nSubdivisions > 360)
+		a_nSubdivisions = 360;
+
+	/*
+		Calculate a_nSubdivisions number of points around a center point in a radial manner
+		then call the AddTri function to generate a_nSubdivision number of faces
+	*/
+	float fDelta = 2.0 * PI / static_cast<float>(a_nSubdivisions);//increment for theta in radians
+	std::vector<vector3> pointlist;
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		vector3 vertex = vector3(cos(fDelta * i) * a_fRadius, sin(fDelta * i) * a_fRadius, 0);
+		pointlist.push_back(vertex);
+	}
+	switch (reverse)
+	{
+	case false:
+		for (uint i = 0; i < a_nSubdivisions; i++)
+		{
+			AddTri(vector3(0.0f, 0.0f, a_fHeight), pointlist[i], pointlist[(i + 1) % a_nSubdivisions]);
+		}
+		break;
+	case true:
+		for (uint i = 0; i < a_nSubdivisions; i++)
+		{
+			AddTri(vector3(0.0, 0.0, a_fHeight), pointlist[(i + 1) % a_nSubdivisions], pointlist[i]);
+		}
+		break;
+	}
+
+	// Adding information about color
+	CompleteMesh(a_v3Color);
+	//CompileOpenGL3X();
+}
 void MyMesh::GenerateCube(float a_fSize, vector3 a_v3Color)
 {
 	if (a_fSize < 0.01f)
@@ -61,7 +105,22 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	float fDelta = 2.0 * PI / static_cast<float>(a_nSubdivisions);//increment for theta in radians
+	std::vector<vector3> pointlist;
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		vector3 vertex = vector3(cos(fDelta * i) * a_fRadius, sin(fDelta * i) * a_fRadius, 0);
+		pointlist.push_back(vertex);
+	}
+
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		AddTri(ZERO_V3, pointlist[(i + 1) % a_nSubdivisions], pointlist[i]);
+	}
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		AddTri(vector3(0.0f,0.0f,a_fHeight), pointlist[i], pointlist[(i + 1) % a_nSubdivisions]);
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -85,7 +144,18 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	float fDelta = 2.0 * PI / static_cast<float>(a_nSubdivisions);//increment for theta in radians
+	std::vector<vector3> pointlist;
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		vector3 vertex = vector3(cos(fDelta * i) * a_fRadius, sin(fDelta * i) * a_fRadius, 0);
+		pointlist.push_back(vertex);
+	}
+
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		AddTri(ZERO_V3, pointlist[(i + 1) % a_nSubdivisions], pointlist[i]);
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -148,6 +218,11 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 
 	// Replace this with your code
 	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	std::vector<vector3>vertex;
+
+	matrix4 m4Transform = IDENTITY_M4;
+	m4Transform = glm::rotate(m4Transform, glm::radians(0.0f), vector3(0.0f, 1.0f, 0.0f));
+	m4Transform = glm::translate(m4Transform, vector3(5.0f, 0.0f, 0.0f));
 	// -------------------------------
 
 	// Adding information about color

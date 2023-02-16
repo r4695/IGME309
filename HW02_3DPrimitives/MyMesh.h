@@ -205,6 +205,9 @@ public:
 	OUTPUT: ---
 	*/
 	void GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Color = C_WHITE);
+
+	//Helper method to generate a circle
+	void GenerateCircle(float a_fRadius,float a_fHeight, int a_nSubdivisions, vector3 a_v3Color, bool reverse);
 #pragma endregion
 };
 

@@ -2,7 +2,7 @@
 void Application::InitVariables(void)
 {
 	//Change this to your name and email
-	m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	m_sProgrammer = "Ragan Stephenson - rrs4695@rit.edu";
 
 	//Set the position and target of the camera
 	//(I'm at [0,0,10], looking at [0,0,0] and up is the positive Y axis)
@@ -62,6 +62,8 @@ void Application::Display(void)
 {
 	// Clear the screen
 	ClearScreen();
+
+	
 
 	//Calculate the model, view and projection matrix
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
