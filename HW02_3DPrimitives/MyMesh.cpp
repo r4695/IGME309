@@ -146,15 +146,22 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	// Replace this with your code
 	float fDelta = 2.0 * PI / static_cast<float>(a_nSubdivisions);//increment for theta in radians
 	std::vector<vector3> pointlist;
+	std::vector<vector3> pointlist2;
 	for (uint i = 0; i < a_nSubdivisions; i++)
 	{
 		vector3 vertex = vector3(cos(fDelta * i) * a_fRadius, sin(fDelta * i) * a_fRadius, 0);
 		pointlist.push_back(vertex);
+		vector3 vertex2 = vector3(cos(fDelta * i) * a_fRadius, sin(fDelta * i) * a_fRadius, 0);
+		pointlist2.push_back(vertex2);
 	}
 
 	for (uint i = 0; i < a_nSubdivisions; i++)
 	{
-		AddTri(ZERO_V3, pointlist[(i + 1) % a_nSubdivisions], pointlist[i]);
+		AddTri(ZERO_V3, pointlist[(i + 1) % a_nSubdivisions], pointlist[i]); 
+		AddTri(vector3(0, 0, a_fHeight), vector3(pointlist2[i].x, pointlist2[i].y, pointlist2[i].z + a_fHeight), vector3(pointlist2[(i + 1) % a_nSubdivisions].x, pointlist2[(i + 1) % a_nSubdivisions].y, pointlist2[(i + 1) % a_nSubdivisions].z + a_fHeight));
+
+		AddTri(pointlist[i], vector3(pointlist2[(i + 1) % a_nSubdivisions].x, pointlist2[(i + 1) % a_nSubdivisions].y, pointlist2[(i + 1) % a_nSubdivisions].z + a_fHeight), vector3(pointlist2[i].x, pointlist2[i].y, pointlist2[i].z + a_fHeight));
+		AddTri(vector3(pointlist2[(i + 1) % a_nSubdivisions].x, pointlist2[(i + 1) % a_nSubdivisions].y, pointlist2[(i + 1) % a_nSubdivisions].z + a_fHeight), vector3(pointlist[i].x, pointlist[i].y, pointlist[i].z), vector3(pointlist[(i + 1) % a_nSubdivisions].x, pointlist[(i + 1) % a_nSubdivisions].y, pointlist[(i + 1) % a_nSubdivisions].z));
 	}
 	// -------------------------------
 
@@ -185,7 +192,29 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	float fDelta = 2.0 * PI / static_cast<float>(a_nSubdivisions);//increment for theta in radians
+	std::vector<vector3> pointlist;//top  outer radius
+	std::vector<vector3> pointlist2;//Top inner  radius
+	std::vector<vector3> pointlist3;//Bottom outer  radius
+	std::vector<vector3> pointlist4;//Bottome inner  radius
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		vector3 vertex = vector3(cos(fDelta * i) * a_fOuterRadius, sin(fDelta * i) * a_fOuterRadius, 0);
+		pointlist.push_back(vertex);
+		vector3 vertex2 = vector3(cos(fDelta * i) * a_fInnerRadius, sin(fDelta * i) * a_fInnerRadius, 0);
+		pointlist2.push_back(vertex2);
+
+		vector3 vertex3 = vector3(cos(fDelta * i) * a_fOuterRadius, sin(fDelta * i) * a_fOuterRadius, a_fHeight);
+		pointlist3.push_back(vertex3);
+		vector3 vertex4 = vector3(cos(fDelta * i) * a_fInnerRadius, sin(fDelta * i) * a_fInnerRadius, a_fHeight);
+		pointlist4.push_back(vertex4);
+	}
+
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		AddTri(pointlist[i], pointlist2[i], pointlist2[(i + 1) % a_nSubdivisions]);
+		AddTri(pointlist2[i], pointlist[i], pointlist[(i + 1) % a_nSubdivisions]);
+	}
 	// -------------------------------
 
 	// Adding information about color
