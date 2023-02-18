@@ -212,8 +212,14 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 
 	for (uint i = 0; i < a_nSubdivisions; i++)
 	{
+		//Top Ring
 		AddTri(pointlist[i], pointlist2[i], pointlist2[(i + 1) % a_nSubdivisions]);
-		AddTri(pointlist2[i], pointlist[i], pointlist[(i + 1) % a_nSubdivisions]);
+		AddTri(pointlist[i], pointlist2[(i + 1) % a_nSubdivisions], pointlist[(i + 1) % a_nSubdivisions]);
+
+		//Bottome Ring
+		AddTri(pointlist3[i], pointlist4[i], pointlist4[(i + 1) % a_nSubdivisions]);
+		AddTri(pointlist3[i], pointlist4[(i + 1) % a_nSubdivisions], pointlist3[(i + 1) % a_nSubdivisions]);
+		
 	}
 	// -------------------------------
 
