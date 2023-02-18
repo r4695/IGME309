@@ -217,9 +217,16 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 		AddTri(pointlist[i], pointlist2[(i + 1) % a_nSubdivisions], pointlist[(i + 1) % a_nSubdivisions]);
 
 		//Bottome Ring
-		AddTri(pointlist3[i], pointlist4[i], pointlist4[(i + 1) % a_nSubdivisions]);
-		AddTri(pointlist3[i], pointlist4[(i + 1) % a_nSubdivisions], pointlist3[(i + 1) % a_nSubdivisions]);
-		
+		AddTri(pointlist3[i], pointlist4[(i + 1) % a_nSubdivisions], pointlist4[i]);
+		AddTri(pointlist3[i], pointlist3[(i + 1) % a_nSubdivisions], pointlist4[(i + 1) % a_nSubdivisions]);
+
+		//Inner Tower
+		AddTri(pointlist2[i], pointlist4[i],pointlist4[(i+1)%a_nSubdivisions]);
+		AddTri(pointlist2[i], pointlist4[(i + 1) % a_nSubdivisions], pointlist2[(i + 1) % a_nSubdivisions]);
+
+		//OuterTower
+		AddTri(pointlist[i], pointlist3[(i+1)%a_nSubdivisions], pointlist3[i]);
+		AddTri(pointlist[i], pointlist[(i + 1) % a_nSubdivisions], pointlist3[(i + 1) % a_nSubdivisions]);
 	}
 	// -------------------------------
 
@@ -252,12 +259,60 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
-	std::vector<vector3>vertex;
 
-	matrix4 m4Transform = IDENTITY_M4;
-	m4Transform = glm::rotate(m4Transform, glm::radians(0.0f), vector3(0.0f, 1.0f, 0.0f));
-	m4Transform = glm::translate(m4Transform, vector3(5.0f, 0.0f, 0.0f));
+	GLfloat theta = 0;
+	GLfloat delta = static_cast<GLfloat>(2.0 * PI / static_cast<GLfloat>(a_nSubdivisionsA));
+	std::vector<vector3>vertex;
+	float cRadius = abs(a_fOuterRadius - a_fInnerRadius);
+
+	std::vector<std::vector<vector3>>circles;//a vector of all the circle
+
+	for (int i = 0; i < a_nSubdivisionsA; i++)//the base circle
+	{
+		vector3 temp = vector3(cos(theta) * cRadius, sin(theta) * cRadius, 0.0f);
+		theta += delta;
+		vertex.push_back(temp);
+	}
+
+	GLfloat lamda = static_cast<GLfloat>(2.0 * PI / static_cast<GLfloat>(a_nSubdivisionsB));//the angle to turn for each subdivision of the torus
+
+	for (uint uSubTorus = 0; uSubTorus < a_nSubdivisionsB; uSubTorus++)//creates a copy of the base circle and places them in the right spot
+	{
+		matrix4 m4Transform = IDENTITY_M4;
+		m4Transform = glm::rotate(m4Transform, lamda*uSubTorus, vector3(0.0f, 1.0f, 0.0f));
+		m4Transform = glm::translate(m4Transform, vector3(a_fInnerRadius+cRadius, 0.0f, 0.0f));
+		std::vector<vector3>  copyVertex;
+		copyVertex = vertex;
+
+		for (int i = 0; i < a_nSubdivisionsA; i++)
+		{
+			copyVertex[i] = vector3(m4Transform * vector4(copyVertex[i], 1.0f));
+		}
+
+		circles.push_back(copyVertex);
+
+		vector3 v3center = ZERO_V3;
+		v3center = m4Transform * vector4(v3center, 1.0f);
+		for (uint i = 0; i < a_nSubdivisionsA; i++)
+		{
+			AddTri(v3center, copyVertex[i], copyVertex[(i + 1) % a_nSubdivisionsA]);
+		}
+	}
+
+	for (int i = 0; i < a_nSubdivisionsB; i++)//For every circle
+	{
+
+		for (int j = 0; j < a_nSubdivisionsA; j++)//for every subdivision in a circle
+		{
+			AddTri(circles[i][j], circles[i][(j + 1) % a_nSubdivisionsA], circles[(i + 1) % a_nSubdivisionsB][(j + 1) % a_nSubdivisionsA]);
+			AddTri(circles[i][j], circles[(i + 1) % a_nSubdivisionsB][(j + 1) % a_nSubdivisionsA], circles[(i + 1) % a_nSubdivisionsB][j]);
+
+
+			//A  little bit of a hack fix but :P
+			AddTri(circles[i][j], circles[(i + 1) % a_nSubdivisionsB][(j + 1) % a_nSubdivisionsA], circles[i][(j + 1) % a_nSubdivisionsA]);
+			AddTri(circles[i][j], circles[(i + 1) % a_nSubdivisionsB][j], circles[(i + 1) % a_nSubdivisionsB][(j + 1) % a_nSubdivisionsA]);
+		}
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -275,14 +330,62 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		GenerateCube(a_fRadius * 2.0f, a_v3Color);
 		return;
 	}
-	if (a_nSubdivisions > 6)
-		a_nSubdivisions = 6;
+	if (a_nSubdivisions > 12)
+	{
+		a_nSubdivisions = 12;
+	}
 
 	Release();
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	GLfloat theta = 0;
+	GLfloat delta = static_cast<GLfloat>(2.0 * PI / static_cast<GLfloat>(a_nSubdivisions));
+	std::vector<vector3>vertex;
+
+	std::vector<std::vector<vector3>>circles;//a vector of all the circle
+
+	for (int i = 0; i < a_nSubdivisions; i++)//the base circle
+	{
+		vector3 temp = vector3(cos(theta) * a_fRadius, sin(theta) * a_fRadius, 0.0f);
+		theta += delta;
+		vertex.push_back(temp);
+	}
+
+	GLfloat lamda = static_cast<GLfloat>(2.0 * PI / static_cast<GLfloat>(a_nSubdivisions));//the angle to turn for each subdivision of the torus
+
+	for (uint uSubTorus = 0; uSubTorus < a_nSubdivisions; uSubTorus++)//creates a copy of the base circle and places them in the right spot
+	{
+		matrix4 m4Transform = IDENTITY_M4;
+		m4Transform = glm::rotate(m4Transform, delta * uSubTorus, vector3(0.0f, 1.0f, 0.0f));
+		m4Transform = glm::translate(m4Transform, vector3(0.0f, 0.0f, 0.0f));
+		std::vector<vector3>  copyVertex;
+		copyVertex = vertex;
+
+		for (int i = 0; i < a_nSubdivisions; i++)
+		{
+			copyVertex[i] = vector3(m4Transform * vector4(copyVertex[i], 1.0f));
+		}
+
+		circles.push_back(copyVertex);
+
+		vector3 v3center = ZERO_V3;
+		for (uint i = 0; i < a_nSubdivisions; i++)
+		{
+			AddTri(v3center, copyVertex[i], copyVertex[(i + 1) % a_nSubdivisions]);
+		}
+	}
+
+	for (int i = 0; i < a_nSubdivisions; i++)//For every circle
+	{
+	
+		for (int j = 0; j < a_nSubdivisions; j++)//for every subdivision in a circle
+		{
+			AddTri(circles[i][j], circles[i][(j + 1) % a_nSubdivisions], circles[(i + 1) % a_nSubdivisions][(j + 1) % a_nSubdivisions]);
+			AddTri(circles[i][j], circles[(i + 1) % a_nSubdivisions][(j + 1) % a_nSubdivisions], circles[(i + 1) % a_nSubdivisions][j]);
+			
+		}
+	}
 	// -------------------------------
 
 	// Adding information about color
