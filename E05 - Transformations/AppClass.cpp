@@ -40,6 +40,7 @@ void Application::Display(void)
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 
 	m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_qArcBall));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(ToMatrix4(m_qArcBall),vector3(1.0f,0.0f,0.0f)));
 
 	// draw a skybox
 	m_pModelMngr->AddSkyboxToRenderList();
