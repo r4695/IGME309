@@ -39,8 +39,71 @@ void Application::Display(void)
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 
-	m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_qArcBall));
-	m_pMesh->Render(m4Projection, m4View, glm::translate(ToMatrix4(m_qArcBall),vector3(1.0f,0.0f,0.0f)));
+	matrix4 worldSpace = ToMatrix4(m_qArcBall);
+	static float value = 0.0f;
+
+	//column 0
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value, 0.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value, 1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value, 2.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value, -1.0f, 0.0f)));
+
+	//column -1
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 1.0f, 0.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 1.0f, 1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 1.0f, 2.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 1.0f, -1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value -1.0f, -3.0f, 0.0f)));
+	//column -2
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 2.0f, 0.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 2.0f, 3.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 2.0f, 2.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 2.0f, -1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value -2.0f, -3.0f, 0.0f)));
+	//column -3
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 3.0f, 0.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 3.0f, 1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 3.0f, 2.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 3.0f, 4.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value - 3.0f, -1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value -3.0f, -2.0f, 0.0f)));
+	//column -4
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value-4.0f, 0.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value-4.0f, 1.0f, 0.0f)));
+	//column 5
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value-5.0f, 0.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value-5.0f, -1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value-5.0f, -2.0f, 0.0f)));
+
+	//column 1
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 1.0f, 0.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 1.0f, 1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 1.0f, 2.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 1.0f, -1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 1.0f, -3.0f, 0.0f)));
+	//column 2
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 2.0f, 0.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 2.0f, 3.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 2.0f, 2.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 2.0f, -1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 2.0f, -3.0f, 0.0f)));
+	//column 3
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 3.0f, 0.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 3.0f, 1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 3.0f, 2.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 3.0f, 4.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 3.0f, -1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value + 3.0f, -2.0f, 0.0f)));
+	//column 4
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value+4.0f, 0.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value+4.0f, 1.0f, 0.0f)));
+	//column 5
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value+5.0f, 0.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value+5.0f, -1.0f, 0.0f)));
+	m_pMesh->Render(m4Projection, m4View, glm::translate(worldSpace, vector3(value+5.0f, -2.0f, 0.0f)));
+
+
+	value += 0.01f;
 
 	// draw a skybox
 	m_pModelMngr->AddSkyboxToRenderList();
