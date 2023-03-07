@@ -2,7 +2,7 @@
 void Application::InitVariables(void)
 {
 	////Change this to your name and email
-	m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	m_sProgrammer = "Ragan Stephenson - rrs4695@rit.edu";
 	vector3 v3Position(0.0f, 0.0f, 10.0f);
 	vector3 v3Target = ZERO_V3;
 	vector3 v3Upward = AXIS_Y;
@@ -37,12 +37,11 @@ void Application::Display(void)
 	m_m4Model = glm::rotate(IDENTITY_M4, glm::radians(m_v3Rotation.x), vector3(1.0f, 0.0f, 0.0f));
 	m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.y), vector3(0.0f, 1.0f, 0.0f));
 	m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.z), vector3(0.0f, 0.0f, 1.0f));
-
 	quaternion q1 = glm::angleAxis(glm::radians(m_v3Rotation.x), AXIS_X);
 	quaternion q2 = glm::angleAxis(glm::radians(m_v3Rotation.y), AXIS_Y);
 	quaternion q3 = glm::angleAxis(glm::radians(m_v3Rotation.z), AXIS_Z);
 	quaternion q4 = q1 * q2;
-	q4 = glm::cross(q4, q3);
+	q4 = q4 * q3;
 
 	//TIP:: When you rotate make sure that you change the orientation
 
