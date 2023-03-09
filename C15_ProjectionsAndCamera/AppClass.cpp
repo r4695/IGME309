@@ -35,7 +35,7 @@ void Application::Update(void)
 	View and Projection matrices for individual models, only all of the models
 	contained in it at once when the render call feeds both of them
 	*/
-	m_pModelMngr->AddModelToRenderList("Minecraft\\Steve.obj", ToMatrix4(m_qArcBall));
+	//m_pModelMngr->AddModelToRenderList("Minecraft\\Steve.obj", ToMatrix4(m_qArcBall));
 
 	//Update Entity Manager
 	m_pEntityMngr->Update();
@@ -49,7 +49,7 @@ void Application::Display(void)
 	ClearScreen();
 
 	// draw a skybox
-	m_pModelMngr->AddSkyboxToRenderList();
+	//m_pModelMngr->AddSkyboxToRenderList();
 
 	//Camera position
 	static float fPos = 0.0f;
@@ -57,7 +57,9 @@ void Application::Display(void)
 	m_pCamera->SetTarget(vector3(0.0f, 0.0f, 0.0f + fPos));
 	m_pCamera->SetUp(vector3(0.0f, 1.0f, 0.0f));
 	fPos -= 0.01f;
-
+	float width = m_pSystem->GetWindowWidth();
+	float height = m_pSystem->GetWindowHeight();
+	m_pCamera->CalculateProjectionMatrix(width, height);
 
 	/* 
 	Steve is in the dll's Camera class space, while the other primitives
@@ -68,9 +70,9 @@ void Application::Display(void)
 	*/
 
 	//draw the primitive
-	//m_pMesh->Render(	m_pCamera->GetProjectionMatrix(),	//Projection
-						//m_pCamera->GetViewMatrix(),			//View
-						//IDENTITY_M4);						//model
+	m_pMesh->Render(	m_pCamera->GetProjectionMatrix(),//Projection
+						m_pCamera->GetViewMatrix(),			//View
+						IDENTITY_M4);						//model
 
 	//render list call
 	m_uRenderCallCount = m_pModelMngr->Render();
