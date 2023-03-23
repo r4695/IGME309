@@ -54,7 +54,7 @@ MyCamera& MyCamera::operator=(MyCamera const& other)
 void MyCamera::Init(void)
 {
 	ResetCamera();
-	CalculateProjectionMatrix();
+	CalculateProjectionMatrix(1080,720);
 	CalculateViewMatrix();
 	//No pointers to initialize here
 }
@@ -106,10 +106,14 @@ void MyCamera::CalculateViewMatrix(void)
 	m_m4View = glm::lookAt(m_v3Position, m_v3Target, m_v3Up);
 }
 
-void MyCamera::CalculateProjectionMatrix(void)
+void MyCamera::CalculateProjectionMatrix(float width = 1080.0f, float height =  720.0f)
 {
 	//perspective
-	float fRatio = 1280.0f / 720.0f;
-	m_m4Projection = glm::perspective(45.0f, fRatio, 0.001f, 1000.0f);
-	//m_m4Projection = glm::ortho(-5.0f * fRatio, 5.0f * fRatio, -5.0f, 5.0f, 0.001f, 1000.0f);
+	float fRatio = static_cast<float>(width)/static_cast<float>(height);
+	static float fFOV = glm::radians(90.0f);
+	static float fNear = 0.001f;
+	static float fFar = 1000.0f;
+	m_m4Projection = glm::perspective(fFOV, fRatio, fNear, fFar);
+	//m_m4Projection = glm::ortho(0.0f, 5.0f * fRatio, -5.0f, 5.0f, fNear, fFar);
+	//fFar += 0.001f;
 }

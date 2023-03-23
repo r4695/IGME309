@@ -63,6 +63,48 @@ void MyRigidBody::Release(void)
 MyRigidBody::MyRigidBody(std::vector<vector3> a_pointList)
 {
 	Init();
+
+	uint uCount = a_pointList.size();
+	if (uCount < 1)
+		return;
+
+	//finding center by averaging(WRONG)
+	m_v3Center = a_pointList[0];
+	for (uint i = 1; i < uCount; i++)
+	{
+		m_v3Center += a_pointList[i];
+	}
+	m_v3Center /= static_cast<float>(uCount);
+
+	//Finding center by max and mins
+
+	m_v3MinL = m_v3MaxL = a_pointList[0];
+	for (uint i = 1; i < uCount; i++)
+	{
+		if (m_v3MinL.x > a_pointList[i].x)
+			m_v3MinL.x = a_pointList[i].x;
+		if (m_v3MinL.y > a_pointList[i].y)
+			m_v3MinL.y = a_pointList[i].y;
+		if (m_v3MinL.z > a_pointList[i].z)
+			m_v3MinL.z = a_pointList[i].z;
+
+		if (m_v3MaxL.x < a_pointList[i].x)
+			m_v3MaxL.x = a_pointList[i].x;
+		if (m_v3MaxL.y < a_pointList[i].y)
+			m_v3MaxL.y = a_pointList[i].y;
+		if (m_v3MaxL.z < a_pointList[i].z)
+			m_v3MaxL.z = a_pointList[i].z;
+	}
+	m_v3Center = (m_v3MaxL + m_v3MinL) / 2.0;
+	m_fRadius = 0.0f;
+	for (uint i = 1; i < uCount; i++)
+	{
+		float fDistance = glm::distance(m_v3Center, a_pointList[i]);
+		if (m_fRadius < fDistance)
+			m_fRadius = fDistance;
+		//m_fRadius = glm::max(m_fRadius, fDistance); Same thing as the if statement
+	}
+	m_fRadius = glm::distance(m_v3Center, m_v3MaxL);
 }
 MyRigidBody::MyRigidBody(MyRigidBody const& other)
 {
@@ -102,6 +144,9 @@ void MyRigidBody::AddToRenderList(void)
 {
 	if (!m_bVisible)
 		return;
+	matrix4 m4Transform = glm::translate(vector3(m_v3Center));
+	m4Transform = m4Transform * glm::scale(vector3(m_fRadius));
+	m_pMeshMngr->AddWireSphereToRenderList(m4Transform, m_v3Color);
 }
 bool MyRigidBody::IsColliding(MyRigidBody* const other)
 {
