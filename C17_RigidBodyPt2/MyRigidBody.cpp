@@ -18,11 +18,41 @@ vector3 MyRigidBody::GetMinGlobal(void) { return m_v3MinG; }
 vector3 MyRigidBody::GetMaxGlobal(void) { return m_v3MaxG; }
 vector3 MyRigidBody::GetHalfWidth(void) { return m_v3HalfWidth; }
 matrix4 MyRigidBody::GetModelMatrix(void) { return m_m4ToWorld; }
+vector3 makeGlobal(matrix4 m4ToWorld, vector3 input) { return m4ToWorld * vector4(input, 1.0f); }
 void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 {
+	//this if prevenets recursion if the model matrix is the same as the global one it will stop
+	if (m_m4ToWorld == a_m4ModelMatrix)
+		return;
 	m_m4ToWorld = a_m4ModelMatrix;
-	m_v3MaxG = vector3(m_m4ToWorld * vector4(m_v3MaxL, 1.0f));
-	m_v3MinG = vector3(m_m4ToWorld * vector4(m_v3MinL, 1.0f));
+	//These two are a trap, do not fall for it - This is just globalizing the max and mins as they are, this will give a box but not the full box
+	//m_v3MaxG = vector3(m_m4ToWorld * vector4(m_v3MaxL, 1.0f));
+	//m_v3MinG = vector3(m_m4ToWorld * vector4(m_v3MinL, 1.0f));
+
+	//generate all 8 corners of the ARBB
+	std::vector<vector3> cornerlist;
+	cornerlist.push_back(vector3(m_v3MinL.x, m_v3MinL.y, m_v3MinL.z));//000
+	cornerlist.push_back(vector3(m_v3MinL.x, m_v3MinL.y, m_v3MaxL.z));//001
+	cornerlist.push_back(vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MinL.z));//010
+	cornerlist.push_back(vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MaxL.z));//011
+
+	cornerlist.push_back(vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MinL.z));//100
+	cornerlist.push_back(vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MaxL.z));//101
+	cornerlist.push_back(vector3(m_v3MaxL.x, m_v3MaxL.y, m_v3MinL.z));//110
+	cornerlist.push_back(vector3(m_v3MaxL.x, m_v3MaxL.y, m_v3MaxL.z));//111
+
+	//Globalize them
+	for (uint i = 0; i < cornerlist.size(); i++)
+	{
+		cornerlist[i] = makeGlobal(m_m4ToWorld, cornerlist[i]);
+		//cornerlist[i] = m_m4ToWorld * vector4(cornerlist[i], 1.0f);
+	}
+
+	//make a new box around them - Done by using the corner list as the points
+	MyRigidBody oTemp(cornerlist);
+	m_v3MinG = oTemp.m_v3MinG;
+	m_v3MaxG = oTemp.m_v3MaxG;
+
 }
 //Allocation
 void MyRigidBody::Init(void)
@@ -190,6 +220,8 @@ void MyRigidBody::AddToRenderList(void)
 		else
 			m_pModelMngr->AddWireCubeToRenderList(glm::translate(m_m4ToWorld, m_v3Center) * glm::scale(m_v3HalfWidth * 2.0f), m_v3ColorNotColliding);
 	}
+	vector3 v3ARBBSize = m_v3MaxG - m_v3MinG;
+	m_pModelMngr->AddWireCubeToRenderList(glm::translate(makeGlobal(m_m4ToWorld, m_v3Center)) * glm::scale(v3ARBBSize), C_YELLOW);
 }
 bool MyRigidBody::IsColliding(MyRigidBody* const other)
 {
