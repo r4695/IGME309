@@ -10,23 +10,36 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	//defining things we'll use later
 	float ra, rb; //ra is self, rb is other
 	matrix3 R, AbsR; //R is rotational matrix and AbsR is the absolute value of the rotational matrix
+
 	//compute rotation matrix expressing b in a's coordinate frame
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 3; i++)
 		{
-			R[i][j] = glm::dot(this->m_m4ToWorld[i][j], a_pOther->m_m4ToWorld[i][j]);
+			R[i][j] = glm::dot(m_m4ToWorld[i][j], a_pOther->m_m4ToWorld[i][j]);
 		}
 	}
 	//compute translation vector t
-	vector3 t = (this->m_m4ToWorld * vector4(this->m_v3Center, 1.0f))- (a_pOther->m_m4ToWorld * vector4(a_pOther->m_v3Center, 1.0f));//points are globalized
+	vector3 t = this->GetCenterGlobal() - a_pOther->GetCenterGlobal();//points are globalized
 	//bring translation into a's coordinate frame
-	//t = vector3(glm::dot(t, this->m_v3Center[i]));
+	t = vector3(glm::dot(t, vector3(m_m4ToWorld[0])), glm::dot(t, vector3(m_m4ToWorld[1])), glm::dot(t, vector3(m_m4ToWorld[2])));
 
 	//compute common sub expressions. Add an epsilon term to counteract arithmetic errors when two edges are parallel and their cross product is (near) null
 	// epsilon is glm::Epsilon<float>()
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			AbsR[i][j] = abs(R[i][j]) + glm::epsilon<float>();
+		}
+	}
 
 	//Test axes L = A0, L =A1, L = A2
+	for (int i = 0; i < 3; i++)
+	{
+		ra = this->m_v3HalfWidth[i];
+		//rb = a_pOther->m_v3HalfWidth[0]*AbsR[i][0]+
+	}
 	//Test axes L = B0, L =B1, L = B2
 	//Test axis L A0 X B0
 	//... for all cross products

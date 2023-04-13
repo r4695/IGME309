@@ -10,7 +10,7 @@ void Application::InitVariables(void)
 
 	//Entity Manager
 	m_pEntityMngr = MyEntityManager::GetInstance();
-
+	//m_pEntityMngr->AddEntity("ShpereCube.obj", "Object");
 	//creeper
 	m_pEntityMngr->AddEntity("Minecraft\\Creeper.obj", "Creeper");
 	m_pEntityMngr->SetAxisVisibility(true, "Creeper"); //set visibility of the entity's axis
