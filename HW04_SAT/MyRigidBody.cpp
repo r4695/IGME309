@@ -38,16 +38,71 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	for (int i = 0; i < 3; i++)
 	{
 		ra = this->m_v3HalfWidth[i];
-		//rb = a_pOther->m_v3HalfWidth[0]*AbsR[i][0]+
+		rb = a_pOther->m_v3HalfWidth[0] * AbsR[i][0] + m_v3HalfWidth[1] * AbsR[i][1] + m_v3HalfWidth[2] * AbsR[i][2];
+		if (abs(t[i]) > ra + rb)
+		{
+			if (i == 0) return 1;
+			if (i == 1) return 1;
+			if (i == 2) return 1;
+		}
 	}
 	//Test axes L = B0, L =B1, L = B2
-	//Test axis L A0 X B0
-	//... for all cross products
-	//at the end if not separatio is found(return 0) then return 1
+	for (int i = 0; i < 3; i++)
+	{
+		ra = this->m_v3HalfWidth[0]*AbsR[0][i]+ this->m_v3HalfWidth[1] * AbsR[1][i]+ this->m_v3HalfWidth[2] * AbsR[2][i];
+		rb = a_pOther->m_v3HalfWidth[i];
+		if (abs(t[i]) > ra + rb)
+		{
+			if (i == 0) return 1;
+			if (i == 1) return 1;
+			if (i == 2) return 1;
+		}
+	}
+	
+	//Test for cross product axes
+	//AXxBX
+	ra = this->m_v3HalfWidth[1] * AbsR[2][0] + this->m_v3HalfWidth[2] * AbsR[1][0];
+	rb = a_pOther->m_v3HalfWidth[1] * AbsR[0][2] + a_pOther->m_v3HalfWidth[2] * AbsR[0][1];
+	if (abs(t[2] * R[1][0] - t[1] * R[2][0]) > ra + rb) { return 1; }
+	//AXxBY
+	ra = this->m_v3HalfWidth[1] * AbsR[2][1] + this->m_v3HalfWidth[2] * AbsR[1][1];
+	rb = a_pOther->m_v3HalfWidth[0] * AbsR[0][2] + a_pOther->m_v3HalfWidth[2] * AbsR[0][0];
+	if (abs(t[2] * R[1][1] - t[1] * R[2][1]) > ra + rb) { return 1; }
+	//AXxBZ
+	ra = this->m_v3HalfWidth[1] * AbsR[2][2] + this->m_v3HalfWidth[2] * AbsR[1][2];
+	rb = a_pOther->m_v3HalfWidth[0] * AbsR[0][1] + a_pOther->m_v3HalfWidth[1] * AbsR[0][0];
+	if (abs(t[2] * R[1][2] - t[1] * R[2][2]) > ra + rb) { return 1; }
+
+	//AYxBX
+	ra = this->m_v3HalfWidth[0] * AbsR[2][0] + this->m_v3HalfWidth[2] * AbsR[0][0];
+	rb = a_pOther->m_v3HalfWidth[1] * AbsR[1][2] + a_pOther->m_v3HalfWidth[2] * AbsR[1][1];
+	if (abs(t[0] * R[2][0] - t[2] * R[0][0]) > ra + rb) { return 1; }
+	//AYxBY
+	ra = this->m_v3HalfWidth[0] * AbsR[2][1] + this->m_v3HalfWidth[2] * AbsR[0][1];
+	rb = a_pOther->m_v3HalfWidth[0] * AbsR[1][2] + a_pOther->m_v3HalfWidth[2] * AbsR[1][0];
+	if (abs(t[0] * R[2][1] - t[2] * R[0][1]) > ra + rb) { return 1; }
+	//AYxBZ
+	ra = this->m_v3HalfWidth[0] * AbsR[2][2] + this->m_v3HalfWidth[1] * AbsR[0][2];
+	rb = a_pOther->m_v3HalfWidth[0] * AbsR[1][1] + a_pOther->m_v3HalfWidth[1] * AbsR[1][0];
+	if (abs(t[0] * R[2][2] - t[2] * R[0][2]) > ra + rb) { return 1; }
+
+	//AZxBX
+	ra = this->m_v3HalfWidth[0] * AbsR[1][0] + this->m_v3HalfWidth[1] * AbsR[0][0];
+	rb = a_pOther->m_v3HalfWidth[0] * AbsR[2][2] + a_pOther->m_v3HalfWidth[2] * AbsR[2][1];
+	if (abs(t[1] * R[0][0] - t[2] * R[0][0]) > ra + rb) { return 1; }
+	//AZxBY
+	ra = this->m_v3HalfWidth[0] * AbsR[1][1] + this->m_v3HalfWidth[1] * AbsR[0][1];
+	rb = a_pOther->m_v3HalfWidth[0] * AbsR[2][2] + a_pOther->m_v3HalfWidth[2] * AbsR[2][0];
+	if (abs(t[1] * R[0][1] - t[0] * R[1][1]) > ra + rb) { return 1; }
+	//AZxBZ
+	ra = this->m_v3HalfWidth[0] * AbsR[1][2] + this->m_v3HalfWidth[1] * AbsR[0][2];
+	rb = a_pOther->m_v3HalfWidth[0] * AbsR[2][1] + a_pOther->m_v3HalfWidth[1] * AbsR[2][0];
+	if (abs(t[1] * R[0][2] - t[0] * R[1][2]) > ra + rb) { return 1; }
+
 
 	//bonus points if you can generate all 15 planes correctly
 
-
+	//If no separation is found, return none
 	return BTXs::eSATResults::SAT_NONE;
 }
 bool MyRigidBody::IsColliding(MyRigidBody* const a_pOther)
