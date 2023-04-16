@@ -9,7 +9,8 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 
 	//defining things we'll use later
 	float ra, rb; //ra is self, rb is other
-	matrix3 R, AbsR; //R is rotational matrix and AbsR is the absolute value of the rotational matrix
+	matrix3 R;//R is the rotational matrix
+	matrix3 AbsR; //AbsR is the absolute value of the rotational matrix
 
 	//compute rotation matrix expressing b in a's coordinate frame
 	for (int i = 0; i < 3; i++)
@@ -103,7 +104,7 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	//bonus points if you can generate all 15 planes correctly
 
 	//If no separation is found, return none
-	return BTXs::eSATResults::SAT_NONE;
+	return 0;
 }
 bool MyRigidBody::IsColliding(MyRigidBody* const a_pOther)
 {
